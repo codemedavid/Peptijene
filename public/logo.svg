@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="pinkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EC407A"/>
+      <stop offset="100%" stop-color="#F48FB1"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#FFFFFF"/>
+  <text x="256" y="280" text-anchor="middle" font-family="Georgia, 'Playfair Display', serif" font-weight="700" font-size="88" fill="url(#pinkGradient)" letter-spacing="-2">Peptijene</text>
+</svg>

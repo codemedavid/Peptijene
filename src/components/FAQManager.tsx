@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Save, X, ChevronDown, ChevronUp, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, ChevronDown, ChevronUp, HelpCircle, ArrowLeft, Database, AlertCircle } from 'lucide-react';
 import { useFAQsAdmin, FAQItem } from '../hooks/useFAQs';
 
 interface FAQManagerProps {
@@ -7,7 +7,8 @@ interface FAQManagerProps {
 }
 
 const FAQManager: React.FC<FAQManagerProps> = ({ onBack }) => {
-    const { faqs, loading, addFAQ, updateFAQ, deleteFAQ, refetch } = useFAQsAdmin();
+    const { faqs, loading, usingDefaults, addFAQ, updateFAQ, deleteFAQ, seedDefaults, refetch } = useFAQsAdmin();
+    const [isSeeding, setIsSeeding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({
@@ -235,6 +236,33 @@ const FAQManager: React.FC<FAQManagerProps> = ({ onBack }) => {
                             </button>
                         </div>
                     </form>
+                </div>
+            )}
+
+            {/* Using Defaults Banner */}
+            {usingDefaults && faqs.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <h4 className="font-medium text-amber-900">Showing default FAQs</h4>
+                            <p className="text-sm text-amber-700 mt-1">
+                                These FAQs are hardcoded defaults. To manage them from the admin, seed them into the database first.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={async () => {
+                            setIsSeeding(true);
+                            await seedDefaults();
+                            setIsSeeding(false);
+                        }}
+                        disabled={isSeeding}
+                        className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors shadow-sm disabled:opacity-50 whitespace-nowrap"
+                    >
+                        <Database className="w-4 h-4" />
+                        {isSeeding ? 'Seeding...' : 'Seed to Database'}
+                    </button>
                 </div>
             )}
 

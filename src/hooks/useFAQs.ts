@@ -199,24 +199,55 @@ export const useFAQsAdmin = () => {
     const [faqs, setFaqs] = useState<FAQItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [usingDefaults, setUsingDefaults] = useState(false);
 
     const fetchAllFAQs = async () => {
         try {
             setLoading(true);
+            setError(null);
             const { data, error: fetchError } = await supabase
                 .from('faqs')
                 .select('*')
                 .order('order_index', { ascending: true });
 
             if (fetchError) {
-                console.warn('FAQs table not found:', fetchError.message);
-                setFaqs([]);
+                console.warn('FAQs table error:', fetchError.message);
+                setError(`Database error: ${fetchError.message}`);
+                setFaqs(defaultFAQs);
+                setUsingDefaults(true);
+            } else if (data && data.length > 0) {
+                setFaqs(data);
+                setUsingDefaults(false);
             } else {
-                setFaqs(data || []);
+                setFaqs(defaultFAQs);
+                setUsingDefaults(true);
             }
         } catch (err) {
             console.error('Error fetching FAQs:', err);
             setError(err instanceof Error ? err.message : 'Unknown error');
+            setFaqs(defaultFAQs);
+            setUsingDefaults(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const seedDefaults = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const faqsToInsert = defaultFAQs.map(({ id, created_at, updated_at, ...rest }) => rest);
+            const { error: insertError } = await supabase
+                .from('faqs')
+                .insert(faqsToInsert);
+
+            if (insertError) {
+                setError(`Failed to seed defaults: ${insertError.message}`);
+            } else {
+                await fetchAllFAQs();
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to seed defaults');
         } finally {
             setLoading(false);
         }
@@ -261,5 +292,5 @@ export const useFAQsAdmin = () => {
         fetchAllFAQs();
     }, []);
 
-    return { faqs, loading, error, addFAQ, updateFAQ, deleteFAQ, refetch: fetchAllFAQs };
+    return { faqs, loading, error, usingDefaults, addFAQ, updateFAQ, deleteFAQ, seedDefaults, refetch: fetchAllFAQs };
 };
