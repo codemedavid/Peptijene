@@ -19,7 +19,7 @@ const OrderTracking = lazy(() => import('./components/OrderTracking'));
 const ProtocolGuide = lazy(() => import('./components/ProtocolGuide'));
 
 import { useMenu } from './hooks/useMenu';
-// import { useCOAPageSetting } from './hooks/useCOAPageSetting';
+import { useCOAPageSetting } from './hooks/useCOAPageSetting';
 
 function MainApp() {
     const cart = useCart();
@@ -100,14 +100,14 @@ function MainApp() {
 
 
 function App() {
-    //   const { coaPageEnabled } = useCOAPageSetting();
+    const { coaPageEnabled } = useCOAPageSetting();
 
     return (
         <Router>
             <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                     <Route path="/" element={<MainApp />} />
-                    <Route path="/coa" element={<COA />} />
+                    {coaPageEnabled && <Route path="/coa" element={<COA />} />}
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/calculator" element={<PeptideCalculator />} />
                     <Route path="/track-order" element={<OrderTracking />} />

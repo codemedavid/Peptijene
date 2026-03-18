@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Menu, X, FlaskConical, Truck, HelpCircle, FileText, BookOpen } from 'lucide-react';
+import { useCOAPageSetting } from '../hooks/useCOAPageSetting';
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { coaPageEnabled } = useCOAPageSetting();
 
   return (
     <>
@@ -50,6 +52,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
                   <HelpCircle className="w-4 h-4" />
                   FAQ
                 </a>
+                {coaPageEnabled && (
                 <a
                   href="/coa"
                   className="text-sm font-medium text-charcoal-600 hover:text-brand-600 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
@@ -57,6 +60,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
                   <FileText className="w-4 h-4" />
                   COA
                 </a>
+                )}
                 <a
                   href="/protocols"
                   className="text-sm font-medium text-charcoal-600 hover:text-brand-600 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
@@ -161,6 +165,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
                   FAQ
                 </a>
 
+                {coaPageEnabled && (
                 <a
                   href="/coa"
                   className="flex items-center gap-3 p-4 rounded-xl text-left font-medium text-charcoal-800 hover:bg-brand-50 transition-colors"
@@ -170,6 +175,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
                   </div>
                   Certificate of Analysis
                 </a>
+                )}
 
                 <a
                   href="/protocols"
