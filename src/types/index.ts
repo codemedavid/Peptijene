@@ -93,6 +93,11 @@ export interface SiteSettings {
   hero_tagline?: string;
   hero_description?: string;
   hero_accent_color?: string;
+  // Contact Methods
+  contact_whatsapp_enabled?: string;
+  contact_whatsapp_number?: string;
+  contact_telegram_enabled?: string;
+  contact_telegram_link?: string;
 }
 
 // Pen Type Options (for injectable products)

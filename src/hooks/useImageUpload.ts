@@ -136,14 +136,18 @@ export const useImageUpload = (folder: string = 'menu-images') => {
         }, 30000); // 30 second timeout
       });
 
-      // Now upload the file
-      // Use the determined content type (may have been set from extension if MIME type was empty)
+      // Read file into ArrayBuffer to avoid Safari/iOS "Load failed" errors
+      // Safari can lose the File reference during async upload, so we read it first
+      const arrayBuffer = await file.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: contentType || 'image/jpeg' });
+
+      // Now upload the blob
       const uploadPromise = supabase.storage
         .from(folder)
-        .upload(fileName, file, {
+        .upload(fileName, blob, {
           cacheControl: '3600',
           upsert: false,
-          contentType: contentType || 'image/jpeg' // Fallback to jpeg if still empty
+          contentType: contentType || 'image/jpeg'
         });
 
       const uploadResult = await Promise.race([

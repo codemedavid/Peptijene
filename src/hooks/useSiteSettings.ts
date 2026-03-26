@@ -35,7 +35,12 @@ export const useSiteSettings = () => {
         hero_subtext: settingsData.find(s => s.id === 'hero_subtext')?.value || 'From the Lab to You — Simplifying Science, One Dose at a Time.',
         hero_tagline: settingsData.find(s => s.id === 'hero_tagline')?.value || 'Quality-tested products. Reliable performance. Trusted by our community.',
         hero_description: settingsData.find(s => s.id === 'hero_description')?.value || 'RSPEPTIDE provides research-grade peptides engineered for precision, purity, and consistency.',
-        hero_accent_color: settingsData.find(s => s.id === 'hero_accent_color')?.value || 'gold-500'
+        hero_accent_color: settingsData.find(s => s.id === 'hero_accent_color')?.value || 'gold-500',
+        // Contact Methods
+        contact_whatsapp_enabled: settingsData.find(s => s.id === 'contact_whatsapp_enabled')?.value || 'false',
+        contact_whatsapp_number: settingsData.find(s => s.id === 'contact_whatsapp_number')?.value || '',
+        contact_telegram_enabled: settingsData.find(s => s.id === 'contact_telegram_enabled')?.value || 'false',
+        contact_telegram_link: settingsData.find(s => s.id === 'contact_telegram_link')?.value || ''
       };
 
       setSiteSettings(settings);
