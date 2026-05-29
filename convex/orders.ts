@@ -168,11 +168,41 @@ export const confirmOrder = mutation({
       quantity: number;
     }> = order.orderItems ?? [];
 
+    // Safe lookup helpers — ID may be an old non-Convex value from localStorage cache
+    const getVariation = async (variationId: string, productName: string, variationName: string | null | undefined) => {
+      try {
+        const doc = await ctx.db.get(variationId as Id<"productVariations">);
+        if (doc) return doc;
+      } catch {
+        // invalid ID format, fall through to name lookup
+      }
+      if (!variationName) return null;
+      const allProducts = await ctx.db.query("products").collect();
+      const product = allProducts.find((p) => p.name === productName);
+      if (!product) return null;
+      const variations = await ctx.db
+        .query("productVariations")
+        .withIndex("by_product", (q) => q.eq("productId", product._id))
+        .collect();
+      return variations.find((v) => v.name === variationName) ?? null;
+    };
+
+    const getProduct = async (productId: string, productName: string) => {
+      try {
+        const doc = await ctx.db.get(productId as Id<"products">);
+        if (doc) return doc;
+      } catch {
+        // invalid ID format, fall through to name lookup
+      }
+      const allProducts = await ctx.db.query("products").collect();
+      return allProducts.find((p) => p.name === productName) ?? null;
+    };
+
     // Stock check
     for (const item of items) {
       const qty = item.quantity ?? 0;
       if (item.variation_id) {
-        const variation = await ctx.db.get(item.variation_id as Id<"productVariations">);
+        const variation = await getVariation(item.variation_id, item.product_name, item.variation_name);
         if (!variation) {
           throw new Error(
             `Variation "${item.variation_name ?? ""}" not found. It may have been deleted.`,
@@ -184,7 +214,7 @@ export const confirmOrder = mutation({
           );
         }
       } else if (item.product_id) {
-        const product = await ctx.db.get(item.product_id as Id<"products">);
+        const product = await getProduct(item.product_id, item.product_name);
         if (!product) {
           throw new Error(`Product "${item.product_name}" not found.`);
         }
@@ -200,14 +230,14 @@ export const confirmOrder = mutation({
     for (const item of items) {
       const qty = item.quantity ?? 0;
       if (item.variation_id) {
-        const variation = await ctx.db.get(item.variation_id as Id<"productVariations">);
+        const variation = await getVariation(item.variation_id, item.product_name, item.variation_name);
         if (variation) {
           await ctx.db.patch(variation._id, {
             stockQuantity: Math.max(0, variation.stockQuantity - qty),
           });
         }
       } else if (item.product_id) {
-        const product = await ctx.db.get(item.product_id as Id<"products">);
+        const product = await getProduct(item.product_id, item.product_name);
         if (product) {
           await ctx.db.patch(product._id, {
             stockQuantity: Math.max(0, product.stockQuantity - qty),
